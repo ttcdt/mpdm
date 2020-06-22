@@ -1,6 +1,11 @@
 MPDM Release Notes
 ==================
 
+2.65
+----
+
+ - Fixed dubious code that was causing crashes in OpenBSD.
+
 2.64
 ----
 

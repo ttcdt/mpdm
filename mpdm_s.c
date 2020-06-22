@@ -180,8 +180,6 @@ char *mpdm_wcstombs(const wchar_t *str, int *s)
    with question marks instead of just failing */
 {
     char *ptr = NULL;
-    char tmp[64];               /* really MB_CUR_MAX + 1 */
-    int l;
     int t = 0;
 
     /* allow NULL values for s */
@@ -195,28 +193,10 @@ char *mpdm_wcstombs(const wchar_t *str, int *s)
         wcstombs(ptr, str, *s);
     }
     else {
-        /* invalid encoding? convert characters one by one */
-        *s = 0;
-
-        while (*str) {
-            if ((l = wctomb(tmp, *str)) <= 0) {
-                /* if char couldn't be converted,
-                   write a question mark instead */
-                l = wctomb(tmp, L'?');
-            }
-
-            tmp[l] = '\0';
-            if ((ptr = mpdm_poke(ptr, s, tmp, l, 1)) == NULL)
-                break;
-
-            str++;
-        }
-
-        /* null terminate and count one less */
-        if (ptr != NULL) {
-            ptr = mpdm_poke(ptr, s, "", 1, 1);
-            (*s)--;
-        }
+        /* if it fails, return "?" */
+        ptr = calloc(2, 1);
+        ptr[0] = '?';
+        return ptr;
     }
 
     return ptr;
