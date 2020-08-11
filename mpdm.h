@@ -209,6 +209,7 @@ int mpdm_write(const mpdm_t fd, const mpdm_t v);
 int mpdm_fseek(const mpdm_t fd, long offset, int whence);
 long mpdm_ftell(const mpdm_t fd);
 int mpdm_feof(const mpdm_t fd);
+int mpdm_flock(mpdm_t fd, int operation);
 FILE * mpdm_get_filehandle(const mpdm_t fd);
 int mpdm_encoding(mpdm_t charset);
 int mpdm_unlink(const mpdm_t filename);

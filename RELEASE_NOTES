@@ -1,6 +1,12 @@
 MPDM Release Notes
 ==================
 
+2.66
+----
+
+ - New function mpdm_flock(), implement UNIX flock(). Does
+   nothing under win32.
+
 2.65
 ----
 

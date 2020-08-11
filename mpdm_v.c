@@ -398,6 +398,9 @@ int mpdm_startup(void)
 #ifdef CONFOPT_SYS_STAT_H
     mpdm_push(w, MPDM_S(L"sys_stat_h"));
 #endif
+#ifdef CONFOPT_SYS_FILE_H
+    mpdm_push(w, MPDM_S(L"sys_file_h"));
+#endif
 #ifdef CONFOPT_PWD_H
     mpdm_push(w, MPDM_S(L"pwd_h"));
 #endif

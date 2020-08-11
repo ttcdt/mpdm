@@ -715,6 +715,8 @@ void test_file(void)
     }
 
     mpdm_unref(eol);
+
+    mpdm_flock(NULL, 1);
 }
 
 

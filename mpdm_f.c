@@ -74,6 +74,10 @@
 #include <sys/stat.h>
 #endif
 
+#ifdef CONFOPT_SYS_FILE_H
+#include <sys/file.h>
+#endif
+
 #include "mpdm.h"
 
 #ifdef CONFOPT_ICONV
@@ -1268,6 +1272,26 @@ int mpdm_feof(const mpdm_t fd)
     struct mpdm_file *fs = (struct mpdm_file *) fd->data;
 
     return feof(fs->in);
+}
+
+
+int mpdm_flock(mpdm_t fd, int operation)
+{
+    int ret = 0;
+
+#ifndef WIN32
+
+    int i = -1;
+    FILE *f = mpdm_get_filehandle(fd);
+
+    if (f != NULL)
+        i = fileno(f);
+
+    ret = flock(i, operation);
+
+#endif /* WIN32 */
+
+    return ret;
 }
 
 
