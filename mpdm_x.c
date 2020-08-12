@@ -338,8 +338,8 @@ mpdm_t mpdm_omap(mpdm_t set, mpdm_t filter, mpdm_t ctxt)
         case MPDM_TYPE_NULL:
             /* invert hash */
             w = MPDM_A(2);
-            mpdm_set_i(w, i, 0);
-            mpdm_set_i(w, v, 1);
+            mpdm_set_i(w, v, 0);
+            mpdm_set_i(w, i, 1);
 
             break;
 

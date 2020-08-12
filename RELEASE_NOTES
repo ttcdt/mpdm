@@ -1,6 +1,12 @@
 MPDM Release Notes
 ==================
 
+2.67
+----
+
+ - omap() with a NULL filter returns a copy of the original
+   set (instead of an inverse object).
+
 2.66
 ----
 
