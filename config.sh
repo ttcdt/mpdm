@@ -31,6 +31,7 @@ while [ $# -gt 0 ] ; do
     --without-wcwidth)      WITHOUT_WCWIDTH=1 ;;
     --without-zlib)         WITHOUT_ZLIB=1 ;;
     --with-zlib)            WITHOUT_ZLIB=0 ;;
+    --without-pwd)          WITHOUT_PWD=1 ;;
     --help)                 CONFIG_HELP=1 ;;
 
     --mingw32-prefix=*)     MINGW32_PREFIX=`echo $1 | sed -e 's/--mingw32-prefix=//'`
@@ -70,6 +71,7 @@ if [ "$CONFIG_HELP" = "1" ] ; then
     echo "--mingw32               Build using the mingw32 compiler."
     echo "--with-zlib             Enable Zlib support."
     echo "--without-zlib          Disable Zlib support."
+    echo "--without-pwd           Disable pwd.h and getpwuid()."
     echo
     echo "Environment variables:"
     echo "CC                    C Compiler."
@@ -97,7 +99,7 @@ echo "# automatically created by config.sh - do not modify" > makefile.opts
 [ "$AR" = "" ] && AR="ar"
 
 # add version
-cat VERSION >> config.h
+echo "#include \"VERSION\"" >> config.h
 
 # add installation prefix
 echo "#define CONFOPT_PREFIX \"$PREFIX\"" >> config.h
@@ -312,16 +314,26 @@ fi
 
 # pwd.h detection
 echo -n "Testing for pwd.h... "
-echo "#include <pwd.h>" > .tmp.c
-echo "int main(void) { return(0); }" >> .tmp.c
-
-$CC $CFLAGS .tmp.c -o .tmp.o 2>> .config.log
-
-if [ $? = 0 ] ; then
-    echo "#define CONFOPT_PWD_H 1" >> config.h 
-    echo "OK"
+if [ "$WITHOUT_PWD" = "1" ] ; then
+    echo "Disabled by user"
 else
-    echo "No"
+    echo "#include <pwd.h>" > .tmp.c
+    echo "#include <unistd.h>" >> .tmp.c
+    echo "int main(void) { struct passwd *p; p = getpwuid(getpid()); return(p != NULL); }" >> .tmp.c
+
+    # NOTE: when setting CFLAGS=-static, the executable crashes
+    # because of getpwuid(). The compiler (somewhat) warns about this,
+    # but that warning is not converted to an error with -Werror,
+    # so it cannot be detected without using acrobatics on
+    # the compiler's output (that will also be too error-prone)
+    $CC -Wall -Wextra -Werror $CFLAGS .tmp.c -o .tmp.o 2>> .config.log
+
+    if [ $? = 0 ] ; then
+        echo "#define CONFOPT_PWD_H 1" >> config.h 
+        echo "OK"
+    else
+        echo "No"
+    fi
 fi
 
 # sys/socket.h detection

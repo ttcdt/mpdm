@@ -1,6 +1,12 @@
 MPDM Release Notes
 ==================
 
+2.68
+----
+
+ - omap() with two array arguments generates an object with
+   values from the first one with indexes from the second one.
+
 2.67
 ----
 

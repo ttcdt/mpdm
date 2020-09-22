@@ -349,6 +349,14 @@ mpdm_t mpdm_omap(mpdm_t set, mpdm_t filter, mpdm_t ctxt)
             break;
 
         case MPDM_TYPE_ARRAY:
+            /* the set provides the values,
+               the filter array provides the indexes */
+            w = MPDM_A(2);
+            mpdm_set_i(w, v, 0);
+            mpdm_set_i(w, mpdm_get(filter, i), 1);
+
+            break;
+
         case MPDM_TYPE_OBJECT:
             w = mpdm_get(filter, v);
             break;
