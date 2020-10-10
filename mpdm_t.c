@@ -510,6 +510,166 @@ unsigned char *mpdm_read_tar_file(const char *fn, FILE *f, size_t *z)
 }
 
 
+/* zip archives */
+
+struct zip_hdr {
+    unsigned int sig;
+    unsigned short min_ver;
+    unsigned short gp_flag;
+    unsigned short comp_meth;
+    unsigned short mtime;
+    unsigned short mdate;
+    unsigned int crc32;
+    unsigned char csz[4];
+    unsigned char usz[4];
+    unsigned char fnsz[2];
+    unsigned char xfsz[2];
+} __attribute__ ((__packed__));
+
+
+int puff(unsigned char *dest,           /* pointer to destination pointer */
+         unsigned long *destlen,        /* amount of output space */
+         const unsigned char *source,   /* pointer to source data pointer */
+         unsigned long *sourcelen);     /* amount of input available */
+
+unsigned char *mpdm_read_zip_mem(const char *fn, const char *zip,
+                                 const char *zip_e, size_t *z)
+{
+    unsigned char *data = NULL;
+
+    while (!data && zip < zip_e) {
+        struct zip_hdr *hdr = (struct zip_hdr *)zip;
+        unsigned char *cdata;
+        unsigned long int usz;
+        unsigned long int csz;
+        unsigned short fnsz;
+        unsigned short xfsz;
+
+        usz  = hdr->usz[3] << 24 | hdr->usz[2] << 16 | hdr->usz[1] << 8 | hdr->usz[0];
+        csz  = hdr->csz[3] << 24 | hdr->csz[2] << 16 | hdr->csz[1] << 8 | hdr->csz[0];
+        fnsz = hdr->fnsz[1] << 8 | hdr->fnsz[0];
+        xfsz = hdr->xfsz[1] << 8 | hdr->xfsz[0];
+
+        if (zip[0] != 'P' || zip[1] != 'K' || fnsz == 0)
+            break;
+
+        cdata = (unsigned char *)zip + sizeof(struct zip_hdr) + fnsz + xfsz;
+
+        if (memcmp(&zip[30], fn, fnsz) == 0) {
+            data = calloc(usz + 1, 1);
+
+            if (hdr->comp_meth == 0)
+                memcpy(cdata, data, usz);
+            else
+            if (hdr->comp_meth == 8)
+                puff(data, &usz, cdata, &csz);
+            else {
+                data = realloc(data, 0);
+                break;
+            }
+
+            *z = usz;
+        }
+        else
+            zip = (char *)cdata + csz;
+    }
+
+    return data;
+}
+
+
+unsigned char *mpdm_read_zip_file(const char *fn, FILE *f, size_t *z)
+{
+    unsigned char *data = NULL;
+
+    return data;
+}
+
+
+/* 'generic' archives */
+
+unsigned char *mpdm_read_arch_mem(const char *fn, const char *arch,
+                                  const char *arch_e, size_t *z)
+{
+    unsigned char *data = NULL;
+
+    if (arch && arch[0] == 'P' && arch[1] == 'K')
+        data = mpdm_read_zip_mem(fn, arch, arch_e, z);
+    else
+        data = mpdm_read_tar_mem(fn, arch, arch_e, z);
+
+    return data;
+}
+
+
+mpdm_t mpdm_read_arch_mem_s(mpdm_t fn, const char *arch, const char *arch_e)
+{
+    mpdm_t f, r = NULL;
+    unsigned char *data;
+    size_t z;
+
+    mpdm_ref(fn);
+
+    /* convert to mbs */
+    f = mpdm_ref(MPDM_2MBS(mpdm_string(fn)));
+
+    if ((data = mpdm_read_arch_mem((const char *)f->data, arch, arch_e, &z)) != NULL) {
+        r = MPDM_MBS((char *)data);
+        free(data);
+    }
+
+    mpdm_unref(f);
+    mpdm_unref(fn);
+
+    return r;
+}
+
+
+unsigned char *mpdm_read_arch_file(const char *fn, FILE *f, size_t *z)
+{
+    unsigned char *data = NULL;
+    char sig[2];
+
+    /* read signature */
+    fread(sig, sizeof(sig), 1, f);
+    rewind(f);
+
+    if (sig[0] == 'P' && sig[1] == 'K')
+        data = mpdm_read_zip_file(fn, f, z);
+    else
+        data = mpdm_read_tar_file(fn, f, z);
+
+    return data;
+}
+
+
+mpdm_t mpdm_read_arch_file_s(mpdm_t fn, mpdm_t fd)
+{
+    mpdm_t fs, r = NULL;
+    FILE *f = mpdm_get_filehandle(fd);
+
+    mpdm_ref(fn);
+
+    /* convert to mbs */
+    fs = mpdm_ref(MPDM_2MBS(mpdm_string(fn)));
+
+    if (f) {
+        unsigned char *data = NULL;
+        size_t z;
+
+        if ((data = mpdm_read_arch_file((const char *)fs->data, f, &z)) != NULL) {
+            r = MPDM_MBS((char *)data);
+            free(data);
+        }
+    }
+
+    mpdm_unref(fs);
+    mpdm_unref(fn);
+
+    return r;
+}
+
+
 /** data vc **/
 
 struct mpdm_type_vc mpdm_vc_mutex = { /* VC */

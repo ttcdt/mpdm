@@ -1,6 +1,22 @@
 MPDM Release Notes
 ==================
 
+2.69
+----
+
+ - New functions:
+   - mpdm_read_zip_mem(), to read a file from a compressed .zip
+     file in memory.
+   - mpdm_read_arch_mem(), to read a file from any in-memory
+     archive format with autodetection (by now, only tar and zip
+     files are supported).
+   - mpdm_read_arch_mem_s(), to read a file from any in-memory
+     archive as a string.
+   - mpdm_read_arch_file(), to read a file from an on-disk
+     archive file (only tar files are supported).
+   - mpdm_read_arch_file_s(), to read a file from an on-disk
+     archive as a string.
+
 2.68
 ----
 

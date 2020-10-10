@@ -251,6 +251,14 @@ unsigned char *mpdm_gzip_inflate(unsigned char *cbuf, size_t cz, size_t *dz);
 unsigned char *mpdm_read_tar_mem(const char *fn, const char *tar,
                                  const char *tar_e, size_t *z);
 unsigned char *mpdm_read_tar_file(const char *fn, FILE *f, size_t *z);
+unsigned char *mpdm_read_zip_mem(const char *fn, const char *zip,
+                                 const char *zip_e, size_t *z);
+unsigned char *mpdm_read_zip_file(const char *fn, FILE *f, size_t *z);
+unsigned char *mpdm_read_arch_mem(const char *fn, const char *arch,
+                                  const char *arch_e, size_t *z);
+mpdm_t mpdm_read_arch_mem_s(mpdm_t fn, const char *arch, const char *arch_e);
+unsigned char *mpdm_read_arch_file(const char *fn, FILE *f, size_t *z);
+mpdm_t mpdm_read_arch_file_s(mpdm_t fn, mpdm_t fd);
 
 int mpdm_is_true(mpdm_t v);
 mpdm_t mpdm_bool(int b);
