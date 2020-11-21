@@ -13,8 +13,8 @@ do_cc mpdm_t.o mpdm_t.c $COMMON
 do_cc mpdm_x.o mpdm_x.c $COMMON
 do_cc mpdm_dd.o mpdm_dd.c $COMMON
 do_cc gnu_regex.o gnu_regex.c config.h
-
-do_ar libmpdm.a mpdm_*.o *regex.o
+do_cc puff.o puff.c
+do_ar libmpdm.a mpdm_*.o *regex.o puff.o
 
 do_cc mpdm-stress.o mpdm-stress.c $COMMON
 do_link mpdm-stress mpdm-stress.o libmpdm.a

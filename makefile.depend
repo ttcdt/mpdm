@@ -10,4 +10,5 @@ mpdm_s.o: mpdm_s.c config.h VERSION mpdm.h
 mpdm_t.o: mpdm_t.c config.h VERSION mpdm.h
 mpdm_v.o: mpdm_v.c config.h VERSION mpdm.h
 mpdm_x.o: mpdm_x.c config.h VERSION mpdm.h
+puff.o: puff.c
 wcwidth.o: wcwidth.c

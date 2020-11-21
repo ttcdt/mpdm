@@ -2292,6 +2292,7 @@ void init_sockets(void)
 
 
 mpdm_t mpdm_connect(mpdm_t host, mpdm_t serv)
+/* opens a client socket to host:serv */
 {
     mpdm_t f = NULL;
     char *h;
@@ -2383,6 +2384,91 @@ mpdm_t mpdm_connect(mpdm_t host, mpdm_t serv)
     return f;
 }
 
+
+mpdm_t mpdm_server(mpdm_t addr, mpdm_t port)
+/* opens a server socket in addr:port, addr can be NULL */
+{
+    mpdm_t f = NULL;
+    char *h;
+    int p;
+    int d = -1;
+    struct sockaddr_in host;
+
+    mpdm_ref(addr);
+    mpdm_ref(port);
+
+    h = addr == NULL ? NULL : mpdm_wcstombs(mpdm_string(addr), NULL);
+    p = mpdm_ival(port);
+
+    init_sockets();
+
+    memset(&host, '\0', sizeof(host));
+
+    if (h != NULL) {
+        struct hostent *he;
+
+        if ((he = gethostbyname(h)) != NULL)
+            memcpy(&host.sin_addr, he->h_addr_list[0], he->h_length);
+        else
+            goto end;
+    }
+
+    host.sin_family = AF_INET;
+    host.sin_port   = htons(p);
+
+    if ((d = socket(AF_INET, SOCK_STREAM, 0)) != -1) {
+        /* reuse addr */
+        int i = 1;
+        setsockopt(d, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
+
+        if (bind(d, (struct sockaddr *)&host, sizeof(host)) == -1) {
+            close(d);
+            d = -1;
+        }
+        else
+            listen(d, SOMAXCONN);
+    }
+
+    /* create file value */
+    if (d != -1) {
+        struct mpdm_file *fs;
+
+        f = MPDM_F(NULL);
+        fs = (struct mpdm_file *) f->data;
+
+        fs->sock = d;
+    }
+
+end:
+    free(h);
+
+    mpdm_unref(port);
+    mpdm_unref(addr);
+
+    return f;
+}
+
+
+mpdm_t mpdm_accept(mpdm_t sock)
+/* accepts a connection from a socket */
+{
+    mpdm_t f = NULL;
+    struct sockaddr_in host;
+    struct mpdm_file *fs;
+    unsigned int l = sizeof(host);
+    int d = -1;
+
+    fs = (struct mpdm_file *)sock->data;
+
+    if ((d = accept(fs->sock, (struct sockaddr *)&host, &l)) != -1) {
+        f = MPDM_F(NULL);
+        fs = (struct mpdm_file *)f->data;
+
+        fs->sock = d;
+    }
+
+    return f;
+}
 
 static int file_close(mpdm_t v)
 /* close any type of file / pipe / socket */

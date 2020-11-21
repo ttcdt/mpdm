@@ -1,6 +1,14 @@
 MPDM Release Notes
 ==================
 
+2.70
+----
+
+ - New functions:
+    - mpdm_server(addr, port), that creates a socket in listen mode.
+    - mpdm_accept(sock), that accepts a connection from a server socket
+      created by mpdm_server().
+
 2.69
 ----
 
