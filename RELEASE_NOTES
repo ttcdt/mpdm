@@ -1,6 +1,14 @@
 MPDM Release Notes
 ==================
 
+2.71
+----
+
+ - New features:
+    - mpdm_sscanf() now implements %w, to match alphabetic words
+      (according to the locale); %W, to match the inverse; and %r,
+      to match the rest of the string.
+
 2.70
 ----
 

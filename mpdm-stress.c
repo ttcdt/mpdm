@@ -1570,13 +1570,22 @@ void test_scanf(void)
     do_test("mpdm_sscanf_15.3",
             mpdm_cmp(mpdm_get_i(v, 2), MPDM_S(L"5678#12@34")) == 0);
 
-    v = mpdm_sscanf( MPDM_S(L"a \"bbb\" c;"),
+    v = mpdm_sscanf(MPDM_S(L"a \"bbb\" c;"),
                     MPDM_S(L"%*S\"%[^\n\"]\""),
                     0);
     do_test("mpdm_sscanf_16",
             mpdm_cmp(mpdm_get_i(v, 0), MPDM_S(L"bbb")) == 0);
 
     do_test("mpdm_sscanf_17", mpdm_get_i(v, 0)->size == 3);
+
+    v = mpdm_sscanf(MPDM_S(L"España, Álgebra"),
+                    MPDM_S(L"%w%W"),
+                    0);
+
+    do_test("mpdm_sscanf_w",
+            mpdm_cmp(mpdm_get_i(v, 0), MPDM_S(L"España")) == 0);
+    do_test("mpdm_sscanf_W",
+            mpdm_cmp(mpdm_get_i(v, 1), MPDM_S(L", ")) == 0);
 }
 
 

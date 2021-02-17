@@ -1459,6 +1459,7 @@ mpdm_t json_parser_lax(wchar_t **s)
 static wchar_t scanf_yset[SCANF_BUF_SIZE];
 static wchar_t scanf_nset[SCANF_BUF_SIZE];
 static wchar_t scanf_mark[SCANF_BUF_SIZE];
+static int (*scanf_cb)(wint_t);
 
 struct {
     wchar_t cmd;
@@ -1476,6 +1477,7 @@ struct {
 
 char *strptime(const char *s, const char *format, struct tm *tm);
 
+static int niswalpha(wint_t i) { return !iswalpha(i); }
 
 /**
  * mpdm_sscanf - Extracts data like sscanf().
@@ -1486,9 +1488,12 @@ char *strptime(const char *s, const char *format, struct tm *tm);
  * Extracts data from a string using a special format pattern, very
  * much like the scanf() series of functions in the C library. Apart
  * from the standard percent-sign-commands (s, u, d, i, f, x,
- * n, [, with optional size and * to ignore), it implements S,
+ * n, [; with optional size and * to ignore), it implements S,
  * to match a string of characters upto what follows in the format
- * string. Also, the [ set of characters can include other % formats.
+ * string; w, to match an alphabetic word (taking locale
+ * into account); W, to match the inverse; and r, to return the rest
+ * of the string. Also, the [ set of characters can include
+ * other % formats.
  *
  * Returns an array with the extracted values. If %n is used, the
  * position in the scanned string is returned as the value.
@@ -1517,6 +1522,7 @@ mpdm_t mpdm_sscanf(const mpdm_t str, const mpdm_t fmt, int offset)
 
             /* empty all buffers */
             scanf_yset[0] = scanf_nset[0] = scanf_mark[0] = L'\0';
+            scanf_cb = NULL;
 
             f++;
 
@@ -1582,6 +1588,22 @@ mpdm_t mpdm_sscanf(const mpdm_t str, const mpdm_t fmt, int offset)
                 }
 
                 scanf_mark[msize] = L'\0';
+            }
+            else
+                /* alphanumeric words */
+            if (cmd == L'w') {
+                scanf_cb = iswalpha;
+            }
+            else
+                /* not alphanumeric words */
+            if (cmd == L'W') {
+                scanf_cb = niswalpha;
+            }
+            else
+                /* rest of the string */
+            if (cmd == L'r') {
+                /* do nothing; there are no filters,
+                   therefore all is matched */
             }
             else
                 /* raw set */
@@ -1706,6 +1728,7 @@ mpdm_t mpdm_sscanf(const mpdm_t str, const mpdm_t fmt, int offset)
             /* now fill the dynamic string */
             while (vsize &&
                    !wcschr(scanf_nset, *i) &&
+                   (scanf_cb == NULL || scanf_cb(*i)) &&
                    (scanf_yset[0] == L'\0' || wcschr(scanf_yset, *i)) &&
                    (msize == 0 || wcsncmp(i, scanf_mark, msize) != 0)) {
 
