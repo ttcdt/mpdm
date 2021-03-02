@@ -1885,6 +1885,24 @@ void test_vc(void)
 }
 
 
+void test_md5(void)
+{
+    mpdm_t v;
+
+    do_test("mpdm_md5 !string 1", mpdm_md5(NULL) == NULL);
+    do_test("mpdm_md5 !string 2", mpdm_md5(MPDM_A(0)) == NULL);
+
+    v = mpdm_md5(MPDM_S(L"a"));
+    do_test("mpdm_md5 1", mpdm_cmp(v, MPDM_S(L"0cc175b9c0f1b6a831c399e269772661")) == 0);
+
+    v = mpdm_md5(MPDM_S(L"abc123"));
+    do_test("mpdm_md5 2", mpdm_cmp(v, MPDM_S(L"e99a18c428cb38d5f260853678922e03")) == 0);
+
+    v = mpdm_md5(MPDM_S(L"This is the end\n"));
+    do_test("mpdm_md5 3", mpdm_cmp(v, MPDM_S(L"fb1ef0d54279435f1a47d74a02b81235")) == 0);
+}
+
+
 void (*func) (void) = NULL;
 
 int main(int argc, char *argv[])
@@ -1939,6 +1957,7 @@ int main(int argc, char *argv[])
     test_escape();
     test_gzip();
     test_vc();
+    test_md5();
 
     benchmark();
 

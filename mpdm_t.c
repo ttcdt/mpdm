@@ -425,7 +425,7 @@ mpdm_t mpdm_exec_thread(mpdm_t c, mpdm_t args, mpdm_t ctxt)
 }
 
 
-/* zlib functions */
+/** zlib functions **/
 
 unsigned char *mpdm_gzip_inflate(unsigned char *cbuf, size_t cz, size_t *dz)
 {
@@ -469,7 +469,7 @@ unsigned char *mpdm_gzip_inflate(unsigned char *cbuf, size_t cz, size_t *dz)
 }
 
 
-/* tar archives */
+/** tar archives **/
 
 unsigned char *mpdm_read_tar_mem(const char *fn, const char *tar,
                                  const char *tar_e, size_t *z)
@@ -510,7 +510,7 @@ unsigned char *mpdm_read_tar_file(const char *fn, FILE *f, size_t *z)
 }
 
 
-/* zip archives */
+/** zip archives **/
 
 struct zip_hdr {
     unsigned int sig;
@@ -536,6 +536,7 @@ unsigned char *mpdm_read_zip_mem(const char *fn, const char *zip,
                                  const char *zip_e, size_t *z)
 {
     unsigned char *data = NULL;
+    int sz = strlen(fn);
 
     while (!data && zip < zip_e) {
         struct zip_hdr *hdr = (struct zip_hdr *)zip;
@@ -555,7 +556,7 @@ unsigned char *mpdm_read_zip_mem(const char *fn, const char *zip,
 
         cdata = (unsigned char *)zip + sizeof(struct zip_hdr) + fnsz + xfsz;
 
-        if (memcmp(&zip[30], fn, fnsz) == 0) {
+        if (sz == fnsz && memcmp(&zip[30], fn, fnsz) == 0) {
             data = calloc(usz + 1, 1);
 
             if (hdr->comp_meth == 0)
@@ -586,7 +587,7 @@ unsigned char *mpdm_read_zip_file(const char *fn, FILE *f, size_t *z)
 }
 
 
-/* 'generic' archives */
+/** 'generic' archives **/
 
 unsigned char *mpdm_read_arch_mem(const char *fn, const char *arch,
                                   const char *arch_e, size_t *z)
@@ -665,6 +666,41 @@ mpdm_t mpdm_read_arch_file_s(mpdm_t fn, mpdm_t fd)
 
     mpdm_unref(fs);
     mpdm_unref(fn);
+
+    return r;
+}
+
+
+/** other utilities **/
+
+void md5_simple(void *output, const void *input, unsigned long size);
+
+mpdm_t mpdm_md5(mpdm_t v)
+{
+    mpdm_t r = NULL;
+
+    mpdm_ref(v);
+
+    if (mpdm_type(v) == MPDM_TYPE_STRING) {
+        char *ptr;
+        unsigned char md5[16];
+        char md5_s[33];
+        int n;
+
+        ptr = mpdm_wcstombs(mpdm_string(v), &n);
+
+        md5_simple(md5, ptr, n);
+
+        for (n = 0; n < sizeof(md5); n++)
+            sprintf(&md5_s[n * 2], "%02x", md5[n]);
+        md5_s[32] = '\0';
+
+        free(ptr);
+
+        r = MPDM_MBS(md5_s);
+    }
+
+    mpdm_unref(v);
 
     return r;
 }

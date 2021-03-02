@@ -263,6 +263,7 @@ unsigned char *mpdm_read_arch_mem(const char *fn, const char *arch,
 mpdm_t mpdm_read_arch_mem_s(mpdm_t fn, const char *arch, const char *arch_e);
 unsigned char *mpdm_read_arch_file(const char *fn, FILE *f, size_t *z);
 mpdm_t mpdm_read_arch_file_s(mpdm_t fn, mpdm_t fd);
+mpdm_t mpdm_md5(mpdm_t v);
 
 int mpdm_is_true(mpdm_t v);
 mpdm_t mpdm_bool(int b);

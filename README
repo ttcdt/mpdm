@@ -16,6 +16,8 @@ Additionally, the following files not authored by the ttcdt are included
 in this repository:
 
  * wcwidth.c: author Markus Kuhn, public domain (or so it seems),
+ * puff.c: author Mark Adler, public domain (or so it seems),
+ * md5.h and md5.c: author Alexander Peslyak, public domain,
  * gnu_regex.h and gnu_regex.c: author FSF, license GPL.
 
 I think the GNU regex can be included here, but IANAL. It's used only on those
