@@ -1960,6 +1960,74 @@ mpdm_t mpdm_chomp(mpdm_t s)
 }
 
 
+/** base64 **/
+
+static char *base64_tbl = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                          "abcdefghijklmnopqrstuvwxyz"
+                          "0123456789+/";
+
+char *mpdm_base64enc_mbs(const unsigned char *str, int iz)
+{
+    char *ptr = NULL;
+    int oz = 0;
+    int n;
+
+    for (n = 0; n < iz; n += 3) {
+        int l = iz - n;
+
+        if (l == 1) {
+            ptr = mpdm_poke(ptr, &oz, &base64_tbl[(str[n] >> 2) & 0x3f], 1, 1);
+            ptr = mpdm_poke(ptr, &oz, &base64_tbl[(str[n] << 4) & 0x3f], 1, 1);
+            ptr = mpdm_poke(ptr, &oz, "==", 2, 1);
+        }
+        else
+        if (l == 2) {
+            ptr = mpdm_poke(ptr, &oz, &base64_tbl[(str[n] >> 2) & 0x3f], 1, 1);
+            ptr = mpdm_poke(ptr, &oz, &base64_tbl[(str[n] << 4 |
+                                                   str[n + 1] >> 4) & 0x3f], 1, 1);
+            ptr = mpdm_poke(ptr, &oz, &base64_tbl[(str[n + 1] << 2) & 0x3f], 1, 1);
+            ptr = mpdm_poke(ptr, &oz, "=", 1, 1);
+        }
+        else {
+            ptr = mpdm_poke(ptr, &oz, &base64_tbl[(str[n] >> 2) & 0x3f], 1, 1);
+            ptr = mpdm_poke(ptr, &oz, &base64_tbl[(str[n] << 4 |
+                                                   str[n + 1] >> 4) & 0x3f], 1, 1);
+            ptr = mpdm_poke(ptr, &oz, &base64_tbl[(str[n + 1] << 2 |
+                                                   str[n + 2] >> 6) & 0x3f], 1, 1);
+            ptr = mpdm_poke(ptr, &oz, &base64_tbl[(str[n + 2]) & 0x3f], 1, 1);
+        }
+    }
+
+    /* null-terminate */
+    ptr = mpdm_poke(ptr, &oz, "", 1, 1);
+
+    return ptr;
+}
+
+
+mpdm_t mpdm_base64enc(mpdm_t v)
+/* encodes a string to base64 */
+{
+    mpdm_t w;
+    char *istr;
+    char *ostr;
+    int i;
+
+    mpdm_ref(v);
+
+    istr = mpdm_wcstombs(mpdm_string(v), &i);
+    ostr = mpdm_base64enc_mbs((unsigned char *)istr, i);
+    w = MPDM_MBS(ostr);
+
+    free(istr);
+    free(ostr);
+
+    mpdm_unref(v);
+
+    return w;
+}
+
+
 /** type vc **/
 
 wchar_t *vc_default_string(mpdm_t v)
@@ -2019,10 +2087,10 @@ static int vc_integer_is_true(mpdm_t v)
 
 static wchar_t *vc_integer_string(mpdm_t v)
 {
-    char tmp[64];
+    char tmp[256];
     wchar_t *str;
 
-    sprintf(tmp, "%d", mpdm_ival(v));
+    snprintf(tmp, sizeof(tmp), "%d", mpdm_ival(v));
     str = mpdm_mbstowcs(tmp, NULL, -1);
 
     return string_persist(str);
@@ -2036,11 +2104,11 @@ static int vc_real_is_true(mpdm_t v)
 
 static wchar_t *vc_real_string(mpdm_t v)
 {
-    char tmp[64];
+    char tmp[256];
     wchar_t *str;
     char *prev_locale = setlocale(LC_NUMERIC, "C");
 
-    sprintf(tmp, "%.15lf", mpdm_rval(v));
+    snprintf(tmp, sizeof(tmp), "%.15lf", mpdm_rval(v));
 
     setlocale(LC_NUMERIC, prev_locale);
 

@@ -58,6 +58,10 @@
 #include <netdb.h>
 #endif
 
+#ifdef CONFOPT_NETINET_IN_H
+#include <netinet/in.h>
+#endif
+
 #include <fcntl.h>
 
 #endif /* CONFOPT_WIN32 */
@@ -1559,9 +1563,9 @@ mpdm_t mpdm_stat(const mpdm_t filename)
         mpdm_set_i(r, MPDM_I(s.st_gid), 5);
         mpdm_set_i(r, MPDM_I(s.st_rdev), 6);
         mpdm_set_i(r, MPDM_I(s.st_size), 7);
-        mpdm_set_i(r, MPDM_I(s.st_atime), 8);
-        mpdm_set_i(r, MPDM_I(s.st_mtime), 9);
-        mpdm_set_i(r, MPDM_I(s.st_ctime), 10);
+        mpdm_set_i(r, MPDM_R((double)s.st_atime), 8);
+        mpdm_set_i(r, MPDM_R((double)s.st_mtime), 9);
+        mpdm_set_i(r, MPDM_R((double)s.st_ctime), 10);
         mpdm_set_i(r, MPDM_I(0), 11);    /* s.st_blksize */
         mpdm_set_i(r, MPDM_I(0), 12);    /* s.st_blocks */
 
@@ -2663,7 +2667,21 @@ int mpdm_close(mpdm_t fd)
 }
 
 
-/** type vc **/
+/** file vc **/
+
+static mpdm_t vc_file_get_i(const mpdm_t f, int index)
+{
+    mpdm_fseek(f, (long) index, 0);
+
+    return mpdm_read(f);
+}
+
+
+static mpdm_t vc_file_get(const mpdm_t f, mpdm_t index)
+{
+    return vc_file_get_i(f, mpdm_ival(index));
+}
+
 
 static mpdm_t vc_file_exec(mpdm_t c, mpdm_t args, mpdm_t ctxt)
 {
@@ -2684,6 +2702,7 @@ static mpdm_t vc_file_exec(mpdm_t c, mpdm_t args, mpdm_t ctxt)
     return r;
 }
 
+
 static int vc_file_iterator(mpdm_t set, int *context, mpdm_t *v, mpdm_t *i)
 {
     mpdm_t w = mpdm_read(set);
@@ -2697,7 +2716,7 @@ static int vc_file_iterator(mpdm_t set, int *context, mpdm_t *v, mpdm_t *i)
 
         if (i) *i = MPDM_I(*context);
 
-        (*context)++;
+        (*context) = (int) mpdm_ftell(set);
         ret = 1;
     }
 
@@ -2710,8 +2729,8 @@ struct mpdm_type_vc mpdm_vc_file = { /* VC */
     vc_file_destroy,        /* destroy */
     vc_default_is_true,     /* is_true */
     vc_default_count,       /* count */
-    vc_default_get_i,       /* get_i */
-    vc_default_get,         /* get */
+    vc_file_get_i,          /* get_i */
+    vc_file_get,            /* get */
     vc_default_string,      /* string */
     vc_default_del_i,       /* del_i */
     vc_default_del,         /* del */

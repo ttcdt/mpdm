@@ -1,6 +1,25 @@
 MPDM Release Notes
 ==================
 
+2.73
+----
+
+* New functions:
+
+mpdm_base64enc_mbs() and mpdm_base64enc(), to encode to BASE64 multibyte strings and values.
+
+* Bug fixes:
+
+Crash when stringifying very big floats.
+
+Fixed compilation under FreeBSD.
+
+* Other new features:
+
+File values can also be accessed by integer, that is used as a file offset.
+
+A new environment variable MPDM_HASH_FUNC allows the external choosing of the hashing functions in objects. Possible values are "fnv", "std" or "null".
+
 2.72
 ----
 

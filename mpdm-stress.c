@@ -1216,7 +1216,7 @@ void bench_hash(int i, mpdm_t l, int buckets)
 {
     mpdm_t o;
     mpdm_t v;
-    int n;
+    int n, min, max;
 
     printf("Hash of %d buckets: \n", buckets);
     mpdm_hash_buckets = buckets;
@@ -1253,11 +1253,22 @@ void bench_hash(int i, mpdm_t l, int buckets)
     timer(-1);
 
     printf("bucket usage:\n");
+    min = 0xfffffff;
+    max = 0;
+
     for (n = 0; n < o->size; n++) {
+        int s;
+
         v = mpdm_get_i(o, n);
-        printf("%d ", mpdm_size(v));
+        s = mpdm_size(v);
+        printf("%d ", s);
+
+        if (min > s)
+            min = s;
+        if (max < s)
+            max = s;
     }
-    printf("\n");
+    printf("\nmin: %d, max: %d, diff: %d\n", min, max, max - min);
 
     mpdm_unref(o);
 /*
@@ -1281,7 +1292,7 @@ void benchmark(void)
 
     printf("BENCHMARKS\n");
 
-    i = 500000;
+    i = 100000;
 
     printf("Creating %d values...\n", i);
 
@@ -1295,9 +1306,11 @@ void benchmark(void)
     printf("OK\n");
 
     bench_hash(i, l, 31);
+    bench_hash(i, l, 32);
     bench_hash(i, l, 61);
     bench_hash(i, l, 89);
     bench_hash(i, l, 127);
+    bench_hash(i, l, 128);
 
     mpdm_unref(l);
 }
@@ -1903,6 +1916,22 @@ void test_md5(void)
 }
 
 
+void test_base64(void)
+{
+    do_test("base64 0", !mpdm_cmp(mpdm_base64enc(MPDM_S(L"")),      MPDM_S(L"")));
+    do_test("base64 1", !mpdm_cmp(mpdm_base64enc(MPDM_S(L"a")),     MPDM_S(L"YQ==")));
+    do_test("base64 2", !mpdm_cmp(mpdm_base64enc(MPDM_S(L"ab")),    MPDM_S(L"YWI=")));
+    do_test("base64 3", !mpdm_cmp(mpdm_base64enc(MPDM_S(L"abc")),   MPDM_S(L"YWJj")));
+    do_test("base64 4", !mpdm_cmp(mpdm_base64enc(MPDM_S(L"abcd")),  MPDM_S(L"YWJjZA==")));
+    do_test("base64 5", !mpdm_cmp(mpdm_base64enc(MPDM_S(L"abcde")), MPDM_S(L"YWJjZGU=")));
+
+    do_test("base64 n", !mpdm_cmp(mpdm_base64enc(MPDM_S(L"What do you mean?")),
+        MPDM_S(L"V2hhdCBkbyB5b3UgbWVhbj8=")));
+    do_test("base64 n + 1", !mpdm_cmp(mpdm_base64enc(MPDM_S(L"What do you mean??")),
+        MPDM_S(L"V2hhdCBkbyB5b3UgbWVhbj8/")));
+}
+
+
 void (*func) (void) = NULL;
 
 int main(int argc, char *argv[])
@@ -1958,6 +1987,7 @@ int main(int argc, char *argv[])
     test_gzip();
     test_vc();
     test_md5();
+    test_base64();
 
     benchmark();
 

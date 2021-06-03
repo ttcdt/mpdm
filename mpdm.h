@@ -192,6 +192,8 @@ mpdm_t mpdm_tr(mpdm_t str, mpdm_t s1, mpdm_t s2);
 mpdm_t mpdm_escape(mpdm_t v, wchar_t low, wchar_t high, mpdm_t f);
 int mpdm_utf8_to_wc(wchar_t *w, int *s, char c);
 mpdm_t mpdm_chomp(mpdm_t s);
+char *mpdm_base64enc_mbs(const unsigned char *str, int iz);
+mpdm_t mpdm_base64enc(mpdm_t v);
 
 mpdm_t mpdm_new_o(void);
 mpdm_t mpdm_get_wcs(const mpdm_t o, const wchar_t *i);

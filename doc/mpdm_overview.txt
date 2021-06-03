@@ -170,10 +170,5 @@ Environment variables
 
 To be written.
 
-MPDM_NULL_HASH
-~~~~~~~~~~~~~~
-
-To be written.
-
 ----
 ttcdt <dev@triptico.com>

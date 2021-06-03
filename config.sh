@@ -364,6 +364,20 @@ else
     echo "No"
 fi
 
+# netinet/in.h detection
+echo -n "Testing for netinet/in.h... "
+echo "#include <netinet/in.h>" > .tmp.c
+echo "int main(void) { struct sockaddr_in si; return(0); }" >> .tmp.c
+
+$CC $CFLAGS .tmp.c -o .tmp.o 2>> .config.log
+
+if [ $? = 0 ] ; then
+    echo "#define CONFOPT_NETINET_IN_H 1" >> config.h
+    echo "OK"
+else
+    echo "No"
+fi
+
 # chown() detection
 echo -n "Testing for chown()... "
 echo "#include <sys/types.h>" > .tmp.c

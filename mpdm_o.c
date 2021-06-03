@@ -27,10 +27,7 @@ int mpdm_hash_buckets = 31;
 /* prototype for the one-time wrapper hash function */
 static int switch_hash_func(const wchar_t *, int);
 
-/* pointer to the hashing function */
-static int (*mpdm_hash_func) (const wchar_t *, int) = switch_hash_func;
-
-static int standard_hash_func(const wchar_t *string, int mod)
+int standard_hash_func(const wchar_t *string, int mod)
 /* computes a hashing function on string */
 {
     int c;
@@ -41,21 +38,44 @@ static int standard_hash_func(const wchar_t *string, int mod)
     return c % mod;
 }
 
+#define FNV_OFFSET  2166136261
+#define FNV_PRIME   16777619
 
-static int null_hash_func(const wchar_t *string, int mod)
+int fnv_hash_func(const wchar_t *string, int mod)
+/* https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function */
+{
+    unsigned int c = FNV_OFFSET;
+ 
+    while (*string) {
+        c ^= *string++;
+        c *= FNV_PRIME;
+    }
+
+    return c % mod;
+}
+
+int null_hash_func(const wchar_t *string, int mod)
 {
     return *string % mod;
 }
 
+/* pointer to the hashing function */
+static int (*mpdm_hash_func) (const wchar_t *, int) = switch_hash_func;
+
 static int switch_hash_func(const wchar_t *string, int mod)
 /* one-time wrapper for hash method autodetection */
 {
-    /* commute the real hashing function on
-       having the MPDM_NULL_HASH environment variable set */
-    if (getenv("MPDM_NULL_HASH") != NULL)
-        mpdm_hash_func = null_hash_func;
-    else
+    char *hash = getenv("MPDM_HASH_FUNC");
+
+    /* select the hashing function */
+    if (hash == NULL || strcmp(hash, "std") == 0)
         mpdm_hash_func = standard_hash_func;
+    else
+    if (strcmp(hash, "fnv") == 0)
+        mpdm_hash_func = fnv_hash_func;
+    else
+    if (strcmp(hash, "null") == 0)
+        mpdm_hash_func = null_hash_func;
 
     /* and fall back to it */
     return mpdm_hash_func(string, mod);
