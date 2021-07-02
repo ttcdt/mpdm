@@ -346,10 +346,8 @@ mpdm_t mpdm_sregex(mpdm_t v, const mpdm_t r, const mpdm_t s, int offset)
         o = mpdm_ref(MPDM_S(mpdm_string(v)));
 
         while ((m = mpdm_regex(o, r, offset)) != NULL) {
-            mpdm_t w;
+            mpdm_t w, no = NULL;
             int del, add;
-
-            mpdm_unrefnd(o);
 
             /* get match information before it gets possibly
                destroyed by mpdm_exec_1() or others */
@@ -377,8 +375,8 @@ mpdm_t mpdm_sregex(mpdm_t v, const mpdm_t r, const mpdm_t s, int offset)
             add = mpdm_size(w);
 
             /* splice */
-            mpdm_splice(o, w, offset, del, &o, NULL);
-            mpdm_ref(o);
+            mpdm_splice(o, w, offset, del, &no, NULL);
+            mpdm_store(&o, no);
 
             /* next iteration shall be after the insertion */
             offset += add;

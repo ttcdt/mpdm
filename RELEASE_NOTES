@@ -1,6 +1,13 @@
 MPDM Release Notes
 ==================
 
+2.74
+----
+
+* Bug fixes:
+
+Memory leak in internal function string_persist().
+
 2.73
 ----
 

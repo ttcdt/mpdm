@@ -277,6 +277,8 @@ static wchar_t *string_persist(wchar_t *str)
         v = MPDM_ENS(str, -1);
         mpdm_set(c, v, v);
     }
+    else
+        free(str);
 
     return (wchar_t *) v->data;
 }
