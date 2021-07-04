@@ -7,7 +7,7 @@ build:
 	@./build.sh
 
 clean:
-	rm -f $(TARGET) $(LIB) $(OBJS) *.o tags *.tar.gz mpdm-stress
+	rm -f $(TARGET) $(LIB) $(OBJS) *.o tags *.tar.gz mpdm-stress test.txt thread.txt
 
 PROJ=mpdm
 

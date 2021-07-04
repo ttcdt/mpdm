@@ -2030,6 +2030,105 @@ mpdm_t mpdm_base64enc(mpdm_t v)
 }
 
 
+/** Unicode NFD and NFC normalizations **/
+
+#include "unicode_tbls.c"
+
+wchar_t *mpdm_unicode_nfd_wcs(wchar_t *str)
+/* Normalizes a string as Unicode NFD form */
+{
+    wchar_t *o = NULL;
+    int z = 0;
+    wchar_t c;
+
+    for (; (c = *str) != L'\0'; str++) {
+        int n, b, t, f = -1;
+
+        /* search the table for this character */
+        b = 0;
+        t = NFD_TBL_SIZE - 1;
+
+        while (f != 0 && t >= b) {
+            n = (b + t) / 2;
+
+            f = unicode_nfd_tbl[n].nfc - c;
+
+            if (f > 0)
+                t = n - 1;
+            else
+            if (f < 0)
+                b = n + 1;
+        }
+
+        if (f == 0)
+            /* transfer the NFD string */
+            o = mpdm_pokewsn(o, &z, unicode_nfd_tbl[n].nfd, unicode_nfd_tbl[n].size);
+        else
+            /* transfer the character verbatim */
+            o = mpdm_pokewsn(o, &z, &c, 1);
+    }
+
+    o = mpdm_pokewsn(o, &z, L"", 1);
+
+    return o;
+}
+
+
+mpdm_t mpdm_unicode_nfd(mpdm_t s)
+{
+    return mpdm_new_wcs(mpdm_unicode_nfd_wcs(mpdm_string(s)), -1, 0);
+}
+
+
+wchar_t *mpdm_unicode_nfc_wcs(wchar_t *str)
+/* Normalizes a string as Unicode NFC form */
+{
+    wchar_t *o = NULL;
+    int z = 0;
+    wchar_t c;
+
+    while ((c = *str) != L'\0') {
+        int n, b, t, f = -1;
+
+        /* search the table for this substring */
+        b = 0;
+        t = NFD_TBL_SIZE - 1;
+
+        while (str[1] != L'\0' && f != 0 && t >= b) {
+            n = (b + t) / 2;
+
+            f = wcsncmp(unicode_nfc_tbl[n].nfd, str, unicode_nfc_tbl[n].size);
+
+            if (f > 0)
+                t = n - 1;
+            else
+            if (f < 0)
+                b = n + 1;
+        }
+
+        if (f == 0) {
+            c = unicode_nfc_tbl[n].nfc;
+            str += unicode_nfc_tbl[n].size;
+        }
+        else
+            str++;
+
+        /* transfer the character */
+        o = mpdm_pokewsn(o, &z, &c, 1);
+    }
+
+    o = mpdm_pokewsn(o, &z, L"", 1);
+
+    return o;
+}
+
+
+mpdm_t mpdm_unicode_nfc(mpdm_t s)
+{
+    return mpdm_new_wcs(mpdm_unicode_nfc_wcs(mpdm_string(s)), -1, 0);
+}
+
+
 /** type vc **/
 
 wchar_t *vc_default_string(mpdm_t v)

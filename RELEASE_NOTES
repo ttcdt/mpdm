@@ -1,6 +1,15 @@
 MPDM Release Notes
 ==================
 
+2.75
+----
+
+* New features:
+
+New Unicode NFD normalization functions mpdm_unicode_nfd() and mpdm_unicode_nfd_wcs().
+
+New Unicode NFC normalization functions mpdm_unicode_nfc() and mpdm_unicode_nfc_wcs().
+
 2.74
 ----
 

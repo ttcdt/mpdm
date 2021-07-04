@@ -194,6 +194,10 @@ int mpdm_utf8_to_wc(wchar_t *w, int *s, char c);
 mpdm_t mpdm_chomp(mpdm_t s);
 char *mpdm_base64enc_mbs(const unsigned char *str, int iz);
 mpdm_t mpdm_base64enc(mpdm_t v);
+wchar_t *mpdm_unicode_nfd_wcs(wchar_t *str);
+wchar_t *mpdm_unicode_nfc_wcs(wchar_t *str);
+mpdm_t mpdm_unicode_nfd(mpdm_t s);
+mpdm_t mpdm_unicode_nfc(mpdm_t s);
 
 mpdm_t mpdm_new_o(void);
 mpdm_t mpdm_get_wcs(const mpdm_t o, const wchar_t *i);

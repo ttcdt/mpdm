@@ -1932,6 +1932,16 @@ void test_base64(void)
 }
 
 
+void test_nfd(void)
+{
+    wchar_t *ptr;
+
+    do_test("nfd 0", wcslen((ptr = mpdm_unicode_nfd_wcs(L"aéiòü"))) == 8);
+    do_test("nfc 0", wcslen(mpdm_unicode_nfc_wcs(ptr)) == 5);
+    do_test("nfc 1", wcscmp(mpdm_unicode_nfc_wcs(ptr), L"aéiòü") == 0);
+}
+
+
 void (*func) (void) = NULL;
 
 int main(int argc, char *argv[])
@@ -1988,6 +1998,7 @@ int main(int argc, char *argv[])
     test_vc();
     test_md5();
     test_base64();
+    test_nfd();
 
     benchmark();
 
