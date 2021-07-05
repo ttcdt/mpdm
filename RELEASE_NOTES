@@ -1,6 +1,13 @@
 MPDM Release Notes
 ==================
 
+2.76
+----
+
+* API changes:
+
+The macro MPDM_CAN_EXEC() no longer exists and has been replaced by function mpdm_can_exec().
+
 2.75
 ----
 

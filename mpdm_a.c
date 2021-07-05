@@ -831,7 +831,8 @@ struct mpdm_type_vc mpdm_vc_array = { /* VC */
     vc_array_set,           /* set */
     vc_default_exec,        /* exec */
     vc_array_iterator,      /* iterator */
-    vc_default_map          /* map */
+    vc_default_map,         /* map */
+    vc_default_cannot_exec  /* can_exec */
 };
 
 struct mpdm_type_vc mpdm_vc_program = { /* VC */
@@ -848,5 +849,6 @@ struct mpdm_type_vc mpdm_vc_program = { /* VC */
     vc_program_set,         /* set */
     vc_program_exec,        /* exec */
     vc_array_iterator,      /* iterator */
-    vc_default_map          /* map */
+    vc_default_map,         /* map */
+    vc_default_can_exec     /* can_exec */
 };

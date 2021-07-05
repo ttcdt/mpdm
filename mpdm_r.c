@@ -359,7 +359,7 @@ mpdm_t mpdm_sregex(mpdm_t v, const mpdm_t r, const mpdm_t s, int offset)
 
             /* loop while it's executable or an object */
             for (;;) {
-                if (MPDM_CAN_EXEC(w))
+                if (mpdm_can_exec(w))
                     w = mpdm_exec_1(w, m, NULL);
                 else
                 if (mpdm_type(w) == MPDM_TYPE_OBJECT)
@@ -415,5 +415,6 @@ struct mpdm_type_vc mpdm_vc_regex = { /* VC */
     vc_default_set,         /* set */
     vc_default_exec,        /* exec */
     vc_default_iterator,    /* iterator */
-    vc_default_map          /* map */
+    vc_default_map,         /* map */
+    vc_default_cannot_exec  /* can_exec */
 };

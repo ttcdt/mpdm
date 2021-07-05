@@ -51,10 +51,6 @@ typedef mpdm_t mpdm_func3_t(mpdm_t, mpdm_t, mpdm_t);
 
 /* value type testing macros */
 
-#define MPDM_CAN_EXEC(v)    (mpdm_type(v) == MPDM_TYPE_FUNCTION || \
-                             mpdm_type(v) == MPDM_TYPE_PROGRAM  || \
-                             mpdm_type(v) == MPDM_TYPE_FILE)
-
 #define MPDM_CAN_GET(v)     (mpdm_type(v) == MPDM_TYPE_FUNCTION || \
                              mpdm_type(v) == MPDM_TYPE_PROGRAM || \
                              mpdm_type(v) == MPDM_TYPE_ARRAY || \
@@ -98,6 +94,7 @@ struct mpdm_type_vc {
     mpdm_t (*exec)(mpdm_t, mpdm_t, mpdm_t);
     int (*iterator)(mpdm_t, int *, mpdm_t *, mpdm_t *);
     mpdm_t (*map)(mpdm_t, mpdm_t, mpdm_t);
+    int (*can_exec)(mpdm_t);
 };
 
 mpdm_t vc_default_destroy(mpdm_t v);
@@ -113,6 +110,8 @@ mpdm_t vc_default_set(mpdm_t v, mpdm_t e, mpdm_t i);
 mpdm_t vc_default_exec(mpdm_t c, mpdm_t args, mpdm_t ctxt);
 int vc_default_iterator(mpdm_t set, int *context, mpdm_t *v, mpdm_t *i);
 mpdm_t vc_default_map(mpdm_t set, mpdm_t filter, mpdm_t ctxt);
+int vc_default_can_exec(mpdm_t v);
+int vc_default_cannot_exec(mpdm_t v);
 
 struct mpdm_type_vc *mpdm_type_vc_by_t(mpdm_type_t t);
 struct mpdm_type_vc *mpdm_type_vc(mpdm_t);
@@ -279,6 +278,7 @@ mpdm_t mpdm_get_i(const mpdm_t a, int index);
 mpdm_t mpdm_get(mpdm_t set, mpdm_t i);
 mpdm_t mpdm_del(mpdm_t set, mpdm_t i);
 mpdm_t mpdm_set(mpdm_t set, mpdm_t v, mpdm_t i);
+int mpdm_can_exec(mpdm_t v);
 mpdm_t mpdm_exec(mpdm_t c, mpdm_t args, mpdm_t ctxt);
 mpdm_t mpdm_exec_1(mpdm_t c, mpdm_t a1, mpdm_t ctxt);
 mpdm_t mpdm_exec_2(mpdm_t c, mpdm_t a1, mpdm_t a2, mpdm_t ctxt);

@@ -143,6 +143,12 @@ mpdm_t mpdm_set(mpdm_t s, mpdm_t e, mpdm_t index)
 }
 
 
+int mpdm_can_exec(mpdm_t v)
+{
+    return mpdm_type_vc(v)->can_exec(v);
+}
+
+
 /**
  * mpdm_exec - Executes an executable value.
  * @c: the code value

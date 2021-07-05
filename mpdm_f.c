@@ -2738,5 +2738,6 @@ struct mpdm_type_vc mpdm_vc_file = { /* VC */
     vc_default_set,         /* set */
     vc_file_exec,           /* exec */
     vc_file_iterator,       /* iterator */
-    vc_default_map          /* map */
+    vc_default_map,         /* map */
+    vc_default_can_exec     /* can_exec */
 };

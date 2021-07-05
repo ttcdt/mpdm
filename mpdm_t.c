@@ -722,7 +722,8 @@ struct mpdm_type_vc mpdm_vc_mutex = { /* VC */
     vc_default_set,         /* set */
     vc_default_exec,        /* exec */
     vc_default_iterator,    /* iterator */
-    vc_default_map          /* map */
+    vc_default_map,         /* map */
+    vc_default_cannot_exec  /* can_exec */
 };
 
 struct mpdm_type_vc mpdm_vc_semaphore = { /* VC */
@@ -739,7 +740,8 @@ struct mpdm_type_vc mpdm_vc_semaphore = { /* VC */
     vc_default_set,         /* set */
     vc_default_exec,        /* exec */
     vc_default_iterator,    /* iterator */
-    vc_default_map          /* map */
+    vc_default_map,         /* map */
+    vc_default_cannot_exec  /* can_exec */
 };
 
 struct mpdm_type_vc mpdm_vc_thread = { /* VC */
@@ -756,5 +758,6 @@ struct mpdm_type_vc mpdm_vc_thread = { /* VC */
     vc_default_set,         /* set */
     vc_default_exec,        /* exec */
     vc_default_iterator,    /* iterator */
-    vc_default_map          /* map */
+    vc_default_map,         /* map */
+    vc_default_cannot_exec  /* can_exec */
 };
